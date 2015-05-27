@@ -6,5 +6,7 @@ state (Pun intended)."
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :plugins [[codox "0.8.12"]]
+  :codox {:src-dir-uri "http://github.com/myguidingstar/well-being/blob/master/"
+          :src-linenum-anchor-prefix "L"}
   :dependencies [[org.clojure/clojure "1.7.0-RC1"]
                  [cheshire "5.4.0"]])
