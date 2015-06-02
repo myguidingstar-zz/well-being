@@ -2,7 +2,36 @@
   (:require [clojure.test :refer :all]
             [cheshire.core :as json]
             [clojure.java.io :as io]
-            [well-being.core :refer :all]))
+            [well-being.core :refer :all]
+            [well-being.correlation :refer :all]))
+
+(deftest percentage-test
+  (is (= (percentage {"yes" [0 2], "no" [1 2]})
+         {"yes" 0, "no" 1/2})))
+
+(deftest percentage-broken-by*-test
+  (testing ""
+    (is (= (->> [{"water_functioning" "yes" "road_available" "yes"}
+                 {"water_functioning" "no"  "road_available" "no"}
+                 {"water_functioning" "yes" "road_available" "yes"}
+                 {"water_functioning" "yes" "road_available" "no"}]
+             (reductions (percentage-broken-by*
+                          "road_available" "water_functioning")
+                         {}))
+           [{}
+            {"yes" [0 1]}
+            {"yes" [0 1], "no" [1 1]}
+            {"yes" [0 2], "no" [1 1]}
+            {"yes" [0 2], "no" [1 2]}]))))
+
+(deftest percentage-broken-by-test
+  (testing "percentage-broken-by-road-available"
+    (is (= (percentage-broken-by "road_available" "water_functioning"
+            [{"water_functioning" "yes" "road_available" "yes"}
+             {"water_functioning" "no"  "road_available" "no"}
+             {"water_functioning" "yes" "road_available" "yes"}
+             {"water_functioning" "yes" "road_available" "no"}])
+           {:road-available {"yes" 0/2, "no" 1/2}}))))
 
 (deftest initialize-aggregated-numbers-tests
   (testing "entry for foo not found, add one"
